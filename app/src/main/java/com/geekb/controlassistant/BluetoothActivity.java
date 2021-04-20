@@ -12,8 +12,9 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.widget.ArrayAdapter;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -21,9 +22,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.Adapter;
+
+import com.tencent.mmkv.MMKV;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,13 +32,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class BluetoothActivity extends AppCompatActivity {
+public class BluetoothActivity extends BaseActivity {
     private final static int REQUEST_ENABLE_BT = 1001;
     private final static int MY_PERMISSION_REQUEST_CONSTANT = 1002;
     private BluetoothAdapter mBluetoothAdapter;
     private SwitchCompat switchCompat;
     private RecyclerView mRvMatched;
     private RecyclerView mRvCanMatch;
+    private TextView mBack;
     private RvAdapter mMatchedAdapter;
     private RvAdapter mCanMatchAdapter;
     private ConnectedThread connectedThread;
@@ -48,9 +50,18 @@ public class BluetoothActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
+        MMKV.defaultMMKV().encode("isFirstLaunch", false);
         switchCompat = findViewById(R.id.sw_bluetooth_switch);
         mRvMatched = findViewById(R.id.rv_matched);
         mRvCanMatch = findViewById(R.id.rv_can_match);
+        mBack = findViewById(R.id.back_title);
+        mBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -85,7 +96,7 @@ public class BluetoothActivity extends AppCompatActivity {
             @Override
             public void onItemClick(BluetoothDevice data) {
                 mBluetoothAdapter.cancelDiscovery();
-                ConnectThread bluetoothThread = new ConnectThread(data,new ConnectThread.BluetoothConnectCallback(){
+                ConnectThread bluetoothThread = new ConnectThread(data, new ConnectThread.BluetoothConnectCallback() {
                     @Override
                     public void connectSuccess(BluetoothSocket socket) {
                         connectedThread = new ConnectedThread(socket);
@@ -181,7 +192,7 @@ public class BluetoothActivity extends AppCompatActivity {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "当前设备不支持蓝牙！", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             if (mBluetoothAdapter.isEnabled()) {
                 switchCompat.setChecked(true);
                 checkAlreadyConnect();
@@ -202,7 +213,7 @@ public class BluetoothActivity extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
 
-                }else {
+                } else {
                     Toast.makeText(this, "没有权限，无法搜索蓝牙！", Toast.LENGTH_SHORT).show();
                 }
                 return;
@@ -246,7 +257,7 @@ public class BluetoothActivity extends AppCompatActivity {
                 //获得 BluetoothDevice
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 //向mArrayAdapter中添加设备信息
-                if (!TextUtils.isEmpty(device.getName()) && !TextUtils.isEmpty(device.getAddress())){
+                if (!TextUtils.isEmpty(device.getName()) && !TextUtils.isEmpty(device.getAddress())) {
                     mCanMatchList.add(device);
                     mCanMatchAdapter.notifyDataSetChanged();
                 }
@@ -255,7 +266,7 @@ public class BluetoothActivity extends AppCompatActivity {
             } else if (action
                     .equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
                 Toast.makeText(getBaseContext(), "扫描完成，点击列表中的设备来尝试连接", Toast.LENGTH_SHORT).show();
-            }else if (action
+            } else if (action
                     .equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 switch (device.getBondState()) {
@@ -275,6 +286,13 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         }
     };
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
     @Override
     protected void onDestroy() {

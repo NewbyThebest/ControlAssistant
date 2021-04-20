@@ -10,7 +10,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:drawableStart="@drawable/baseline_keyboard_backspace_black_24dp"
-        android:text="蓝牙"
+        android:text="去绑定"
         android:drawablePadding="8dp"
         android:textSize="18sp"
         android:textColor="@color/black"

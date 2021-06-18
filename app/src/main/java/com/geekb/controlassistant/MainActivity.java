@@ -23,6 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 public class MainActivity extends BaseActivity {
     private RecyclerView mMenuRv;
     private MenuAdapter mMenuAdapter;
@@ -39,7 +43,7 @@ public class MainActivity extends BaseActivity {
         initData();
         mMenuRv = findViewById(R.id.rv_menu);
         mMenuBtn = findViewById(R.id.menu);
-        mMenuAdapter = new MenuAdapter(this,mList);
+        mMenuAdapter = new MenuAdapter(this, mList);
         mMenuRv.setAdapter(mMenuAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.VERTICAL);
@@ -54,14 +58,14 @@ public class MainActivity extends BaseActivity {
 
         popupMenu = new PopupMenu(this, mMenuBtn);
         //将 R.menu.menu_main 菜单资源加载到popup中
-        getMenuInflater().inflate(R.menu.menu_main,popupMenu.getMenu());
+        getMenuInflater().inflate(R.menu.menu_main, popupMenu.getMenu());
         //为popupMenu选项添加监听器
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.bluetooth_setting:
-                        Intent intent = new Intent(MainActivity.this,BluetoothActivity.class);
+                        Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
                         startActivity(intent);
                         break;
                     case R.id.commit_setting:
@@ -80,12 +84,39 @@ public class MainActivity extends BaseActivity {
 
 
     }
-    void initData(){
-        mList.add(new BindData("空调开关"));
-        mList.add(new BindData("电冰箱开关"));
-        mList.add(new BindData("电视开关"));
-        mList.add(new BindData("热水器开关"));
-        mList.add(new BindData("电饭煲开关"));
+
+    void initData() {
+        NetManager.getInstance().getNetService().getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<BindData>>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+
+                    }
+
+                    @Override
+                    public void onNext(List<BindData> datas) {
+                        mList.addAll(datas);
+                        if (mMenuAdapter != null) {
+                            mMenuAdapter.setDatas(mList);
+                            mMenuAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+//        mList.add(new BindData("空调开关"));
+//        mList.add(new BindData("电冰箱开关"));
+//        mList.add(new BindData("电视开关"));
+//        mList.add(new BindData("热水器开关"));
+//        mList.add(new BindData("电饭煲开关"));
+//        mList.add(new BindData("电磁炉开关"));
+//        mList.add(new BindData("洗衣机开关"));
+//        mList.add(new BindData("灯泡开关"));
     }
 
 

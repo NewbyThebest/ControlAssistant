@@ -32,6 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 public class BluetoothActivity extends BaseActivity {
     private final static int REQUEST_ENABLE_BT = 1001;
     private final static int MY_PERMISSION_REQUEST_CONSTANT = 1002;
@@ -185,6 +189,24 @@ public class BluetoothActivity extends BaseActivity {
         registerReceiver(mReceiver, intent);
 
         initBluetooth();
+
+        NetManager.getInstance().getNetService().initDB()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Boolean>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(Boolean success) {
+                    }
+                });
 
     }
 

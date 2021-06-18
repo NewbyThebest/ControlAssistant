@@ -8,6 +8,7 @@ public class ControlApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        NetManager.getInstance().initRetrofit();
         MMKV.initialize(this);
     }
 }

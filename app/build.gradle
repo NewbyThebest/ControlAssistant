@@ -41,4 +41,14 @@ dependencies {
     implementation 'com.tencent:mmkv-static:1.2.7'
 
     implementation 'com.gyf.immersionbar:immersionbar:3.0.0'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.0.2'
+    // Retrofit库
+    implementation 'com.squareup.okhttp3:okhttp:3.1.2'
+    // Okhttp库
+    implementation 'com.squareup.retrofit2:converter-gson:2.0.2'
+
+    //Rxjava
+    implementation 'io.reactivex:rxandroid:1.2.1'
+    implementation 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
 }

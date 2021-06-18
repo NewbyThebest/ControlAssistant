@@ -3,10 +3,15 @@ package com.geekb.controlassistant;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.tencent.mmkv.MMKV;
+
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class JumpActivity extends BaseActivity{
     @Override

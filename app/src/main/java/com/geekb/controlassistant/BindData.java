@@ -1,10 +1,10 @@
 package com.geekb.controlassistant;
 
 public class BindData {
-    public String name;
+    public String operation;
     public boolean isBound;
-    public int type;
-    public BindData(String name){
-        this.name = name;
+    public int gesture;
+    public BindData(String operation){
+        this.operation = operation;
     }
 }
